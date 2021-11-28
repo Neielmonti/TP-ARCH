@@ -104,14 +104,15 @@ def cargar_cuentas(v):
 
 #Mostrar vector CUENTAS
 def print_v_cuentas(v):
-    print()
+    clear_screen()
     for i in range(len(v)):
         if v[i].Activa:
             print(f"Nro. cuenta: {v[i].Numero_cuenta}, DNI: {v[i].DNI}")
             print(f"Apellido y nombre: {v[i].Apellido}, {v[i].Nombre}")
             print(f"Tipo de cuenta: {v[i].Tipo_Cuenta}, SALDO: {v[i].Saldo}")
             print("-"*50)
-    print()      
+    input("Presione [ENTER] para continuar: ")
+    clear_screen()      
 
 #Cargar vector CAJEROS
 def cargar_cajeros(v):
@@ -134,22 +135,25 @@ def cargar_cajeros(v):
 
 #Mostrar vector CAJEROS
 def print_v_cajeros(v):
-    print()
+    clear_screen()
     print(f"Nro. cajero         Ubicacion         Cant. de mov.")
     print("-"*50)
     for i in range(len(v)):
-        print(f"   {v[i].Numero_cajero:>3}       {v[i].Ubicacion:>20}         {v[i].Cant_mov:>5}")
-    print()
+        print(f"   {v[i].Numero_cajero:>3}       {v[i].Ubicacion:>21}         {v[i].Cant_mov:>5}")
+    input("Presione [ENTER] para continuar: ")
+    clear_screen()
 
 #Mostrar saldo de la cuenta ingresada por teclado
 def buscar_cuenta_teclado(v_cuentas):
     #valor = ingresar_valor(max)
-    max = buscar_siguiente(v_cuentas) - 1
-    teclado = input(f"Ingrese un número de cuenta (entre 1000 y {max+1000}): ")
+    #max = buscar_siguiente(v_cuentas) - 1
+    #min = buscar_menor(v_cuentas)
+    teclado = input(f"Ingrese su número de cuenta: ")
 
     while not teclado.isnumeric():
+        clear_screen()
         print("[ERROR]: Cadena no numérica, intente otra vez")
-        teclado = input(f"Ingrese un número de cuenta (entre 1000 y {max+1000}): ")
+        teclado = input(f"Ingrese su número de cuenta: ")
 
     valor = int(teclado)
     print()
@@ -165,12 +169,13 @@ def buscar_cuenta_teclado(v_cuentas):
     else:
         clear_screen()
         print("[CUENTA NO ENCONTRADA]")
+        input("Presione [ENTER] para continuar: ")
+        clear_screen()
     print()
 
 #Consigna 2
 def consigna(v_cuentas,v_cajeros,freq_cajeros):
     a1 = open("OPERACIONES.TXT","r")
-
     linea = a1.readline().strip()
     s = linea.split(",")
     num_cuenta = int(s[0])
@@ -207,11 +212,14 @@ def consigna(v_cuentas,v_cajeros,freq_cajeros):
         print(f"    {num_cuenta_ant}:       $ {suma_mov}")
         v_cuentas[i].Saldo += suma_mov
         i += 1
+
     print()
     buscar_mayor_cajeros(freq_cajeros)
     print()
     a1.close()
     input("Presione [ENTER] para continuar: ")
+    clear_screen()
+    return v_cuentas, v_cajeros
 
 #Buscar cajero con mayor cantidad de movimientos
 def buscar_mayor_cajeros(f):
@@ -236,7 +244,7 @@ def dar_alta(v_cuentas):
     if dni.isnumeric():
         repetido = 0
         for i in range(len(v_cuentas)):
-            if dni == v_cuentas[i].DNI:
+            if dni == v_cuentas[i].DNI and v_cuentas[i].Activa:
                 repetido = 1
                 cuenta_repetida = i
 
@@ -270,9 +278,9 @@ def dar_alta(v_cuentas):
 
             MAX_V = buscar_siguiente(v_cuentas)
 
-            v_cuentas[MAX_V].Numero_cuenta = 1000 + MAX_V
-            v_cuentas[MAX_V].Apellido =str(apellido)
-            v_cuentas[MAX_V].Nombre = str(nombre)
+            v_cuentas[MAX_V].Numero_cuenta = v_cuentas[MAX_V-1].Numero_cuenta + 1
+            v_cuentas[MAX_V].Apellido =str(apellido.upper())
+            v_cuentas[MAX_V].Nombre = str(nombre.upper())
             v_cuentas[MAX_V].DNI = str(dni)
             v_cuentas[MAX_V].Tipo_Cuenta = int(tipo_cuenta)
             v_cuentas[MAX_V].Saldo = saldo
@@ -282,6 +290,7 @@ def dar_alta(v_cuentas):
             print("Cuenta creada satisfactiriamente")
             print()
             input("Presione [ENTER] para continuar: ")
+            clear_screen()
         else:
             clear_screen()
             print("[ERROR]: DNI ya registrado")
@@ -291,14 +300,14 @@ def dar_alta(v_cuentas):
     else:
         if dni != "":
             print()
+            clear_screen()
             print("[ERROR]: Se ingreso una cadena no numerica")
             dar_alta(v_cuentas)
 
-    return v_cuentas, MAX_V
+    return v_cuentas
         
 #Borrado de cuentas
 def borrar_cuenta(vc):
-    clear_screen()
     nro = input("Ingrese el numero de la cuenta que desea borrar (o presione [ENTER] para [SALIR]): ")
     if nro.isnumeric():
         encontrada = 0
@@ -321,6 +330,8 @@ def borrar_cuenta(vc):
             clear_screen()
             print("[ERROR]: Se ingreso una cadena no numerica")
             borrar_cuenta(vc)
+        else:
+            clear_screen()
     return vc
 
 #Modificar una cuenta
@@ -397,6 +408,7 @@ def modificar_cuenta(v_cuentas):
             print("Cuenta modificada satisfactiriamente")
             print()
             input("Presione [ENTER] para continuar: ")
+            clear_screen()
         else:
             clear_screen()
             print("[ERROR]: Cuenta no encontrada")
@@ -422,17 +434,28 @@ def dar_de_alta1600(v):
     v[600].Activa = True
 
 def clear_screen():
-    for i in range(50):
+    for i in range(70):
         print()
 
-#Buscar el seguiente indice al maximo indice
+#Buscar el indice de la menor cuenta activa
+def buscar_menor(v):
+    i = 0
+    encontrado = 0
+    while i < len(v) and encontrado != 1:
+        if v[i].Activa:
+            encontrado = 1
+            primer_valor = i
+        else:
+            i += 1
+    return primer_valor
+
+#Buscar el seguiente indice al maximo valor activo
 def buscar_siguiente(v):
     i = 0
     while v[i].Activa:
         i += 1
         ult_valor = i
     return ult_valor
-
 
 # 3) Realizar ABM sobre CUENTAS
 #        A Altas de nuevas cuentas [CASI]
@@ -444,18 +467,112 @@ def buscar_siguiente(v):
 #        - La numeración de las nuevas cuentas debe ser consecutiva
 
 
-#MAIN BOOTY
+#MAIN MENU
+def main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado):
+
+    clear_screen()
+
+    print("[A]: Opciones del banco (Actualizar, mostrar informacion de todas las cuentas y cajeros)")
+    print("[B]: Opciones de usuario (Consultar, dar de alta, borrar y modificar una cuenta)")
+    print()
+    opcion1 = input("Seleccione uno de los grupos de opciones (o [ENTER] para [SALIR]): ")
+
+    while opcion1 != "A" and opcion1 != "B" and opcion1 != "a" and opcion1 != "b" and opcion1 != "":
+        clear_screen()
+        print("[ERROR]: Acción inválida")
+        print()
+        print("[A]: Opciones del banco (Actualizar, mostrar informacion de todas las cuentas y cajeros)")
+        print("[B]: Opciones de usuario (Consultar, dar de alta, borrar y modificar una cuenta)")
+        print()
+        opcion1 = input("Seleccione uno de los grupos de opciones (o [ENTER] para [SALIR]): ")
+    
+    if opcion1 == "A" or opcion1 == "a":
+        clear_screen()
+        print("[OPCION 1]: ACTUALIZAR DATOS DE LAS CUENTAS")
+        print("            (Esto informará por pantalla el total de movimientos de cada cuenta y")
+        print("             tambien informará sobre el cajero con mayor cantidad de movimientos)")
+        print("[OPCION 2]: Mostrar la información de TODAS las cuentas")
+        print("[OPCION 3]: Mostrar la información de TODOS los cajeros")
+        print()
+        opcionA = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
+
+        while opcionA != "1" and opcionA != "2" and opcionA != "3" and opcionA != "":
+            clear_screen()
+            print("[ERROR]: Acción inválida")
+            print()
+            print("[OPCION 1]: ACTUALIZAR DATOS DE LAS CUENTAS")
+            print("            (Esto informará por pantalla el total de movimientos de cada cuenta y")
+            print("             tambien informará sobre el cajero con mayor cantidad de movimientos)")
+            print("[OPCION 2]: Mostrar la información de TODAS las cuentas")
+            print("[OPCION 3]: Mostrar la información de TODOS los cajeros")
+            print()
+            opcionA = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
+        if opcionA == "1":
+            clear_screen()
+            consigna(v_cuentas,v_cajeros, freq_cajeros)
+            actualizado = 1
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+        elif opcionA == "2":
+            clear_screen()
+            print_v_cuentas(v_cuentas)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+        elif opcionA == "3":
+            clear_screen()
+            print_v_cajeros(v_cajeros)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+        else:
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+
+
+    elif opcion1 == "B" or opcion1 == "b":
+        clear_screen()
+        if actualizado == 0:
+            print("[PRECAUCION]: Se recomienda primero actualizar los datos de las cuentas,")
+            print("              De otra forma, no se asegura la validez de los datos")
+            print()
+        print("[OPCION 1]: Ingresar un nro. de cuenta por teclado y mostrar su informacion por pantalla")
+        print("[OPCION 2]: Dar de alta una cuenta")
+        print("[OPCION 3]: Borrar una cuenta")
+        print("[OPCION 4]: Modificar una cuenta ")
+        print()
+        opcionB = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
+
+        while opcionB != "1" and opcionB != "2" and opcionB != "3" and opcionB != "4" and opcionB != "":
+            clear_screen()
+            print("[ERROR]: Acción inválida")
+            print()
+            if actualizado == 0:
+                print("[PRECAUCION]: Se recomienda primero actualizar los datos de las cuentas,")
+                print("              De otra forma, no se asegura la validez de los datos")
+                print()
+            print("[OPCION 1]: Ingresar un nro. de cuenta por teclado y mostrar su informacion por pantalla")
+            print("[OPCION 2]: Dar de alta una cuenta")
+            print("[OPCION 3]: Borrar una cuenta")
+            print("[OPCION 4]: Modificar una cuenta ")
+            print()
+            opcionB = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
+        if opcionB == "1":
+            clear_screen()
+            buscar_cuenta_teclado(v_cuentas)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+        elif opcionB == "2":
+            clear_screen()
+            dar_alta(v_cuentas)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+        elif opcionB == "3":
+            clear_screen()
+            borrar_cuenta(v_cuentas)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+        elif opcionB == "4":
+            clear_screen()
+            modificar_cuenta(v_cuentas)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+        else:
+            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+
+    return v_cuentas, v_cajeros, freq_cajeros
+
+actualizado = 0
 cargar_cuentas(v_cuentas)
 cargar_cajeros(v_cajeros)
-consigna(v_cuentas,v_cajeros,freq_cajeros)
-#buscar_cuenta_teclado(v_cuentas)
-
-#print_v_cajeros(v_cajeros)
-#print_v_cuentas(v_cuentas)
-
-#dar_alta(v_cuentas)
-
-#modificar_cuenta(v_cuentas)
-#borrar_cuenta(v_cuentas)
-
-
+main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)     
