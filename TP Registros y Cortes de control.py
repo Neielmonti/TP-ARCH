@@ -1,7 +1,39 @@
-import numpy as np
-import random
-from pyrecord import Record
 
+
+# -----------------------------------------------------------------------------------------------
+# Apellido y nombre: MONTI, KEVIN NEIEL
+# DNI: 44003780
+# Legajo: 182871
+#-----------------------------------------------------------------------------------------------
+#
+"""
+
+
+
+
+[CONSIDERACIONES IMPORTANTES]: 
+
+1) Antes de comenzar, me gustaria aclarar que la cuenta nro. 1600 se da de alta dentro del mismo algoritmo que carga el vector de cuentas,
+para poder evitar la inconsistencia entre los datos (esta cuenta fue creada por mi, por lo que no necesariamente sea igual a la de otros trabajos practicos entregados).
+Este punto fue tratado por Discord por anterioridad, y se decidio que, al faltar la cuenta nro. 1600 en el archivo "CUENTAS.TXT", cada alumno debe de dar de alta la
+misma, por su cuenta.
+
+2) Existen 2 grupos de opciones dentro del menu principal, uno llamado "[A]: Opciones del banco" y otro "[B]: Opciones de usuario".
+El [B] se recomienda utilizar una vez que se haya actualizado el vector de cuentas, con la accion "[OPCION 1]: ACTUALIZAR DATOS DE LAS CUENTAS".
+Decidí dejar la opcion de poder crear, borrar, modificar, y consultar cuentas sin tener que actualizar los datos obligatoriamente, porque esto puede agilizar el 
+testeo del programa por parte del equipo docente.
+
+"""
+
+
+
+
+
+
+
+
+#                                  TP REGISTROS Y CORTES DE CONTROL
+# 
 # Una entidad bancaria tiene organizada su información en los siguientes vectores de registros:
 #        [CUENTAS]   datos de los clientes
 #        [CAJEROS]   datos de los cajeros automáticos
@@ -60,6 +92,19 @@ from pyrecord import Record
 # -----------------------------------------------------------------------------------------------
 # RESTRICCIÓN: El  archivo  OPERACIONES.TXT puede  leerse  por  completo solamente 
 # Una Vez en todo el programa durante el corte de Control.
+
+
+
+
+
+
+
+#--CODIGO-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+import numpy as np
+import random
+from pyrecord import Record
 
 r_cuentas = Record.create_type("r_cuentas","Numero_cuenta","Apellido","Nombre","DNI","Tipo_Cuenta","Saldo","Activa",Numero_cuenta=0,Apellido="",Nombre="",DNI="",Tipo_Cuenta=0,Saldo=0.0,Activa=True)
 v_cuentas = np.array([r_cuentas] * 650)
@@ -145,9 +190,7 @@ def print_v_cajeros(v):
 
 #Mostrar saldo de la cuenta ingresada por teclado
 def buscar_cuenta_teclado(v_cuentas):
-    #valor = ingresar_valor(max)
-    #max = buscar_siguiente(v_cuentas) - 1
-    #min = buscar_menor(v_cuentas)
+
     teclado = input(f"Ingrese su número de cuenta: ")
 
     while not teclado.isnumeric():
@@ -274,7 +317,10 @@ def dar_alta(v_cuentas):
         
             #saldo = "A"
             clear_screen()
-            saldo = float(input("Ingrese su saldo (no mienta) (: "))
+            saldo = input("Ingrese su saldo (no mienta) (: ")
+            while type(saldo) != float:
+                print("[ERROR]: Dato no válido")
+                saldo = (input("Ingrese su saldo (no mienta) (: "))
 
             MAX_V = buscar_siguiente(v_cuentas)
 
@@ -283,7 +329,7 @@ def dar_alta(v_cuentas):
             v_cuentas[MAX_V].Nombre = str(nombre.upper())
             v_cuentas[MAX_V].DNI = str(dni)
             v_cuentas[MAX_V].Tipo_Cuenta = int(tipo_cuenta)
-            v_cuentas[MAX_V].Saldo = saldo
+            v_cuentas[MAX_V].Saldo = float(saldo)
             v_cuentas[MAX_V].Activa = True
 
             clear_screen()
@@ -457,16 +503,6 @@ def buscar_siguiente(v):
         ult_valor = i
     return ult_valor
 
-# 3) Realizar ABM sobre CUENTAS
-#        A Altas de nuevas cuentas [CASI]
-#        B Borrado de cuentas, solo se pone Activa en False
-#        M Modificaciones como Apellido, Nombre, DNI y Tipo de cuenta
-
-#        - Considerar que cada cliente puede tener solamente 1 cuenta en el banco. Al realizar un alta 
-#          debe verificarse que no exista una cuenta activa para el mismo DNI.
-#        - La numeración de las nuevas cuentas debe ser consecutiva
-
-
 #MAIN MENU
 def main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado):
 
@@ -575,4 +611,7 @@ def main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado):
 actualizado = 0
 cargar_cuentas(v_cuentas)
 cargar_cajeros(v_cajeros)
-main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)     
+#main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)     
+
+pepe = "11"
+print(float(pepe))
