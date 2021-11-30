@@ -249,23 +249,11 @@ def consigna(v_cuentas,v_cajeros,freq_cajeros):
         print(f"    {num_cuenta_ant}:       $ {suma_mov}")
         v_cuentas[i].Saldo += suma_mov
         i += 1
-
-    print()
-    print("Desea ver el cajero con mayor cantidad de movimientos en el año? ( 1:[SI], 2:[NO])")
-    mayor_c = input("Ingrese la opcion elegida: ")
-    while mayor_c != "1" and mayor_c !="2":
-        clear_screen()
-        print("[ERROR]: Accion invalida")
-        print()
-        print("Desea ver el cajero con mayor cantidad de movimientos en el año? ( 1:[SI], 2:[NO])")
-        mayor_c = input("Ingrese la opcion elegida: ")
-    if mayor_c == "1":
-        buscar_mayor_cajeros(freq_cajeros)
     print()
     a1.close()
     input("Presione [ENTER] para continuar: ")
     clear_screen()
-    return v_cuentas, v_cajeros
+    return v_cuentas, v_cajeros, freq_cajeros
 
 #Buscar cajero con mayor cantidad de movimientos
 def buscar_mayor_cajeros(f):
@@ -281,7 +269,9 @@ def buscar_mayor_cajeros(f):
             iguales += 1
     print()
     print(f"El cajero con mayor cantidad de movimientos en el año fue el [{cajero}] con [{mayor}] movimientos, compartiendo esta cantidad con [{iguales}] cajeros")
-    return cajero
+    print()
+    input("Presione [ENTER] para continuar: ")
+    clear_screen()
 
 #Dar de alta una cuenta
 def dar_alta(v_cuentas,euv):
@@ -542,7 +532,7 @@ def buscar_siguiente(v):
     return ult_valor
 
 #MAIN MENU
-def main_menu(v_cuentas, v_cajeros, freq_cajeros, euv):
+def main_menu(v_cuentas, v_cajeros, freq_cajeros, euv, ac):
 
     clear_screen()
 
@@ -567,10 +557,11 @@ def main_menu(v_cuentas, v_cajeros, freq_cajeros, euv):
         print("             tambien informará sobre el cajero con mayor cantidad de movimientos)")
         print("[OPCION 2]: Mostrar la información de TODAS las cuentas")
         print("[OPCION 3]: Mostrar la información de TODOS los cajeros")
+        print("[OPCION 4]: Mostrar el cajero con mayor cantidad de movimientos en el año")
         print()
         opcionA = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
 
-        while opcionA != "1" and opcionA != "2" and opcionA != "3" and opcionA != "":
+        while opcionA != "1" and opcionA != "2" and opcionA != "3" and opcionA != "4" and opcionA != "":
             clear_screen()
             print("[ERROR]: Acción inválida")
             print()
@@ -579,22 +570,36 @@ def main_menu(v_cuentas, v_cajeros, freq_cajeros, euv):
             print("             tambien informará sobre el cajero con mayor cantidad de movimientos)")
             print("[OPCION 2]: Mostrar la información de TODAS las cuentas")
             print("[OPCION 3]: Mostrar la información de TODOS los cajeros")
+            print("[OPCION 4]: Mostrar el cajero con mayor cantidad de movimientos en el año")
             print()
             opcionA = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
         if opcionA == "1":
             clear_screen()
             consigna(v_cuentas,v_cajeros, freq_cajeros)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            ac = 1
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
         elif opcionA == "2":
             clear_screen()
             print_v_cuentas(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
         elif opcionA == "3":
             clear_screen()
             print_v_cajeros(v_cajeros)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
+        elif opcionA == "4":
+            if ac == 1:
+                clear_screen()
+                buscar_mayor_cajeros(freq_cajeros)
+                main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
+            else:
+                clear_screen()
+                print("[ERROR]: Es necesario [ACTUALIZAR] antes de realizar esta operacion")
+                print()
+                input("Presione [ENTER] para continuar: ")
+                clear_screen()
+                main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
         else:
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
 
 
     elif opcion1 == "B" or opcion1 == "b":
@@ -619,25 +624,26 @@ def main_menu(v_cuentas, v_cajeros, freq_cajeros, euv):
         if opcionB == "P" or opcionB == "p":
             clear_screen()
             buscar_cuenta_teclado(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
         elif opcionB == "A" or opcionB == "a":
             clear_screen()
             v_cuentas,euv = dar_alta(v_cuentas,euv)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
         elif opcionB == "B" or opcionB == "b":
             clear_screen()
             borrar_cuenta(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
         elif opcionB == "M" or opcionB == "m":
             clear_screen()
             modificar_cuenta(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
         else:
-            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv, ac)
 
     return v_cuentas, v_cajeros, freq_cajeros
 
+actualizado = 0
 elementos_utiles_v = 600
 cargar_cuentas(v_cuentas)
 cargar_cajeros(v_cajeros)
-main_menu(v_cuentas, v_cajeros, freq_cajeros,elementos_utiles_v)
+main_menu(v_cuentas, v_cajeros, freq_cajeros,elementos_utiles_v,actualizado)
