@@ -15,26 +15,6 @@ para poder evitar la inconsistencia entre los datos (esta cuenta fue creada por 
 Este punto fue tratado por Discord por anterioridad, y se decidio que, al faltar la cuenta nro. 1600 en el archivo "CUENTAS.TXT", cada alumno debe de dar de alta la
 misma, por su cuenta.
 
-2) Existen 2 grupos de opciones dentro del menu principal, uno llamado "[A]: Opciones del banco" y otro "[B]: Opciones de usuario".
-El [B] se recomienda utilizar una vez que se haya actualizado el vector de cuentas, con la accion "[OPCION 1]: ACTUALIZAR DATOS DE LAS CUENTAS".
-Decidí dejar la opcion de poder crear, borrar, modificar, y consultar cuentas sin tener que actualizar los datos obligatoriamente, porque esto puede agilizar el 
-testeo del programa por parte del equipo docente.
-
-DE NO ACTUALIZAR LOS DATOS, el programa no se romperá, pero se podria (por ejemplo) borrar una cuenta, crear otra (esta nueva cuenta reemplazaria a la anterior, por
-lo que tendria su nro. de cuenta) y actualizar, por lo que se le asignarian los movimientos que le correspondian a la cuenta borrada.
-
-Si hubiera querido prohibir "[B]: Opciones de usuario" hasta que el usuario actualice los datos de las cuentas, 
-hubiera bastado con agregar lo siguiente en el menu principal:
-
-        if actualizado == 1:
-            "CARTELES"
-            opcionB = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
-            [...]
-        else:
-            print("[ERROR]: Comando prohibido, es necesario actualizar antes")
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
-
-
 
 """
 
@@ -205,24 +185,30 @@ def buscar_cuenta_teclado(v_cuentas):
         print("[ERROR]: Cadena no numérica, intente otra vez")
         teclado = input(f"Ingrese su número de cuenta: ")
 
-    valor = int(teclado)
-    print()
-    i = 0
-    num_cuenta = v_cuentas[i].Numero_cuenta
-    while num_cuenta != valor and i < (len(v_cuentas)-1):
-        i += 1
-        num_cuenta = v_cuentas[i].Numero_cuenta
+    min = v_cuentas[0].Numero_cuenta
 
-    if valor == v_cuentas[i].Numero_cuenta and v_cuentas[i].Activa:
+    indice = int(teclado) - min
+
+    if indice < 0 or indice > (len(v_cuentas)-1):
         clear_screen()
-        print(f"Saldo de la cuenta número {valor}: {v_cuentas[i].Saldo}")
+        print("[ERROR]: Cuenta fuera de rango")
         input("Presione [ENTER] para continuar: ")
+        clear_screen()
+
     else:
-        clear_screen()
-        print("[CUENTA NO ENCONTRADA]")
-        input("Presione [ENTER] para continuar: ")
-        clear_screen()
-    print()
+        if v_cuentas[indice].Activa:
+            clear_screen()
+            print(f"Cuenta nro: {v_cuentas[indice].Numero_cuenta}, DNI: {v_cuentas[indice].DNI}, Saldo: {v_cuentas[indice].Saldo}")
+            print(f"Apellido y nombre: {v_cuentas[indice].Apellido}, {v_cuentas[indice].Nombre}, Tipo de cuenta: {v_cuentas[indice].Tipo_Cuenta}")
+            print()
+            input("Presione [ENTER] para continuar: ")
+            clear_screen()
+
+        else:
+            clear_screen()
+            print("Cuenta no encontrada")
+            input("Presione [ENTER] para continuar: ")
+            clear_screen()
 
 #Consigna 2
 def consigna(v_cuentas,v_cajeros,freq_cajeros):
@@ -265,7 +251,16 @@ def consigna(v_cuentas,v_cajeros,freq_cajeros):
         i += 1
 
     print()
-    buscar_mayor_cajeros(freq_cajeros)
+    print("Desea ver el cajero con mayor cantidad de movimientos en el año? ( 1:[SI], 2:[NO])")
+    mayor_c = input("Ingrese la opcion elegida: ")
+    while mayor_c != "1" and mayor_c !="2":
+        clear_screen()
+        print("[ERROR]: Accion invalida")
+        print()
+        print("Desea ver el cajero con mayor cantidad de movimientos en el año? ( 1:[SI], 2:[NO])")
+        mayor_c = input("Ingrese la opcion elegida: ")
+    if mayor_c == "1":
+        buscar_mayor_cajeros(freq_cajeros)
     print()
     a1.close()
     input("Presione [ENTER] para continuar: ")
@@ -289,13 +284,13 @@ def buscar_mayor_cajeros(f):
     return cajero
 
 #Dar de alta una cuenta
-def dar_alta(v_cuentas):
+def dar_alta(v_cuentas,euv):
 
     dni = input("Ingrese su DNI (o presione [ENTER] para [SALIR]): ")
     if dni.isnumeric():
         repetido = 0
         for i in range(len(v_cuentas)):
-            if dni == v_cuentas[i].DNI and v_cuentas[i].Activa:
+            if dni == v_cuentas[i].DNI:
                 repetido = 1
                 cuenta_repetida = i
 
@@ -327,50 +322,75 @@ def dar_alta(v_cuentas):
             clear_screen()
             saldo = float(input("Ingrese su saldo: "))
 
-            MAX_V = buscar_siguiente(v_cuentas)
+            #MAX_V = buscar_siguiente(v_cuentas)
 
-            v_cuentas[MAX_V].Numero_cuenta = v_cuentas[MAX_V-1].Numero_cuenta + 1
-            v_cuentas[MAX_V].Apellido =str(apellido.upper())
-            v_cuentas[MAX_V].Nombre = str(nombre.upper())
-            v_cuentas[MAX_V].DNI = str(dni)
-            v_cuentas[MAX_V].Tipo_Cuenta = int(tipo_cuenta)
-            v_cuentas[MAX_V].Saldo = float(saldo)
-            v_cuentas[MAX_V].Activa = True
+            v_cuentas[euv+1].Numero_cuenta = v_cuentas[euv].Numero_cuenta + 1
+            v_cuentas[euv+1].Apellido =str(apellido.upper())
+            v_cuentas[euv+1].Nombre = str(nombre.upper())
+            v_cuentas[euv+1].DNI = str(dni)
+            v_cuentas[euv+1].Tipo_Cuenta = int(tipo_cuenta)
+            v_cuentas[euv+1].Saldo = float(saldo)
+            v_cuentas[euv+1].Activa = True
+
+            euv += 1
 
             clear_screen()
             print("Cuenta creada satisfactiriamente")
             print()
             input("Presione [ENTER] para continuar: ")
             clear_screen()
+
+        elif repetido == 1 and not v_cuentas[cuenta_repetida].Activa:
+
+            clear_screen()
+            print("La cuenta esta dada de baja, desea activarla? (1:[SI], 2:[NO])")
+            activar_cuenta = input("Ingrese la opcion deseada: ")
+
+            while activar_cuenta != "1" and activar_cuenta != "2":
+                clear_screen()
+                print("[ERROR]: Accion invalida")
+                print()
+                activar_cuenta = input("Ingrese la opcion deseada: ")
+
+            if activar_cuenta == "1":
+                v_cuentas[cuenta_repetida].Activa = True
+                clear_screen()
+                print("Cuenta activada satisfactiriamente")
+                print()
+                input("Presione [ENTER] para continuar: ")
+                clear_screen()
+            else:
+                clear_screen()
+                dar_alta(v_cuentas,euv)
+
         else:
             clear_screen()
             print("[ERROR]: DNI ya registrado")
             print(f"Cuenta nro: {v_cuentas[cuenta_repetida].Numero_cuenta}, DNI: {v_cuentas[cuenta_repetida].DNI}, Saldo: {v_cuentas[cuenta_repetida].Saldo}")
             print(f"Apellido y nombre: {v_cuentas[cuenta_repetida].Apellido}, {v_cuentas[cuenta_repetida].Nombre}, Tipo de cuenta: {v_cuentas[cuenta_repetida].Tipo_Cuenta}")
             print()
-            dar_alta(v_cuentas)
+            dar_alta(v_cuentas,euv)
     else:
         if dni != "":
             print()
             clear_screen()
             print("[ERROR]: Se ingreso una cadena no numerica")
-            dar_alta(v_cuentas)
+            dar_alta(v_cuentas,euv)
 
-    return v_cuentas
+    return v_cuentas, euv
         
 #Borrado de cuentas
 def borrar_cuenta(vc):
     nro = input("Ingrese el numero de la cuenta que desea borrar (o presione [ENTER] para [SALIR]): ")
     if nro.isnumeric():
         encontrada = 0
-        for i in range(len(vc)):
-            if int(nro) == vc[i].Numero_cuenta:
-                encontrada = 1
-                index_cuenta = i
-        if encontrada == 1:
+        min = vc[0].Numero_cuenta
+        indice = int(nro) - min
+
+        if indice >= 0 and indice <(len(vc)) and vc[indice].Activa:
             clear_screen()
             print(f"Se eliminó la cuenta nro. {nro} satisfactoriamente")
-            vc[index_cuenta].Activa = False
+            vc[indice].Activa = False
             print()
             input("Presione [ENTER] para continuar: ")
         else:
@@ -391,13 +411,9 @@ def modificar_cuenta(v_cuentas):
 
     nro_cuenta = input("Ingrese su número de cuenta (o presione [ENTER] para [SALIR]): ")
     if nro_cuenta.isnumeric():
-        encontrada = 0
-        for i in range(len(v_cuentas)):
-            if int(nro_cuenta) == v_cuentas[i].Numero_cuenta:
-                encontrada = 1
-                index_cuenta = i
-
-        if encontrada == 1:
+        min = v_cuentas[0].Numero_cuenta
+        indice = int(nro_cuenta) - min
+        if indice >= 0 and indice < (len(v_cuentas)) and v_cuentas[indice].Activa:
             print("[1]: Modificar apellido")
             print("[2]: Modificar nombre")
             print("[3]: Modificar DNI")
@@ -424,7 +440,7 @@ def modificar_cuenta(v_cuentas):
                     clear_screen()
                     print("[ERROR]: La cadena ingresada contiene caracteres no alfabéticos")
                     apellido = str(input("Ingrese su apellido: "))
-                v_cuentas[index_cuenta].Apellido =str(apellido.upper())
+                v_cuentas[indice].Apellido =str(apellido.upper())
                 limpiar_pantalla_mod()
 
             elif int(mod) == 2:
@@ -433,7 +449,7 @@ def modificar_cuenta(v_cuentas):
                     clear_screen()
                     print("[ERROR]: La cadena ingresada contiene caracteres no alfabéticos")
                     nombre = str(input("Ingrese su nombre: "))
-                v_cuentas[index_cuenta].Nombre = str(nombre.upper())
+                v_cuentas[indice].Nombre = str(nombre.upper())
                 limpiar_pantalla_mod()
 
             elif int(mod) == 3:
@@ -448,7 +464,7 @@ def modificar_cuenta(v_cuentas):
                         repetido = 1
                         cuenta_repetida = i
                 if repetido == 0:
-                    v_cuentas[index_cuenta].DNI = str(DNI)
+                    v_cuentas[indice].DNI = str(DNI)
                     limpiar_pantalla_mod()
                 else:
                     clear_screen()
@@ -468,7 +484,7 @@ def modificar_cuenta(v_cuentas):
                         print("[ERROR]: Tipo de cuenta no válida")
                         tipo_cuenta = str(input("Ingrese su tipo de cuenta(1-15): "))
                 limpiar_pantalla_mod()
-                v_cuentas[index_cuenta].Tipo_Cuenta = int(tipo_cuenta)
+                v_cuentas[indice].Tipo_Cuenta = int(tipo_cuenta)
                     
         else:
             clear_screen()
@@ -526,7 +542,7 @@ def buscar_siguiente(v):
     return ult_valor
 
 #MAIN MENU
-def main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado):
+def main_menu(v_cuentas, v_cajeros, freq_cajeros, euv):
 
     clear_screen()
 
@@ -568,69 +584,60 @@ def main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado):
         if opcionA == "1":
             clear_screen()
             consigna(v_cuentas,v_cajeros, freq_cajeros)
-            actualizado = 1
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
         elif opcionA == "2":
             clear_screen()
             print_v_cuentas(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
         elif opcionA == "3":
             clear_screen()
             print_v_cajeros(v_cajeros)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
         else:
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
 
 
     elif opcion1 == "B" or opcion1 == "b":
         clear_screen()
-        if actualizado == 0:
-            print("[PRECAUCION]: Se recomienda primero actualizar los datos de las cuentas,")
-            print("              De otra forma, no se asegura la validez de los datos")
-            print()
-        print("[OPCION 1]: Ingresar un nro. de cuenta por teclado y mostrar su saldo por pantalla")
-        print("[OPCION 2]: Dar de alta una cuenta")
-        print("[OPCION 3]: Borrar una cuenta")
-        print("[OPCION 4]: Modificar una cuenta ")
+        print("[OPCION P]: Ingresar un nro. de cuenta por teclado y mostrar su saldo por pantalla")
+        print("[OPCION A]: Dar de alta una cuenta")
+        print("[OPCION B]: Borrar una cuenta")
+        print("[OPCION M]: Modificar una cuenta ")
         print()
         opcionB = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
 
-        while opcionB != "1" and opcionB != "2" and opcionB != "3" and opcionB != "4" and opcionB != "":
+        while opcionB != "P" and opcionB != "p" and opcionB != "A" and opcionB != "a" and opcionB != "B" and opcionB != "b" and opcionB != "M" and opcionB != "m" and opcionB != "":
             clear_screen()
             print("[ERROR]: Acción inválida")
             print()
-            if actualizado == 0:
-                print("[PRECAUCION]: Se recomienda primero actualizar los datos de las cuentas,")
-                print("              De otra forma, no se asegura la validez de los datos")
-                print()
-            print("[OPCION 1]: Ingresar un nro. de cuenta por teclado y mostrar su saldo por pantalla")
-            print("[OPCION 2]: Dar de alta una cuenta")
-            print("[OPCION 3]: Borrar una cuenta")
-            print("[OPCION 4]: Modificar una cuenta ")
+            print("[OPCION P]: Ingresar un nro. de cuenta por teclado y mostrar su saldo por pantalla")
+            print("[OPCION A]: Dar de alta una cuenta")
+            print("[OPCION B]: Borrar una cuenta")
+            print("[OPCION M]: Modificar una cuenta ")
             print()
             opcionB = input("Ingrese el numero de la opcion que desea realizar (o presione [ENTER] para [SALIR]): ")
-        if opcionB == "1":
+        if opcionB == "P" or opcionB == "p":
             clear_screen()
             buscar_cuenta_teclado(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
-        elif opcionB == "2":
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+        elif opcionB == "A" or opcionB == "a":
             clear_screen()
-            dar_alta(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
-        elif opcionB == "3":
+            v_cuentas,euv = dar_alta(v_cuentas,euv)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+        elif opcionB == "B" or opcionB == "b":
             clear_screen()
             borrar_cuenta(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
-        elif opcionB == "4":
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
+        elif opcionB == "M" or opcionB == "m":
             clear_screen()
             modificar_cuenta(v_cuentas)
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
         else:
-            main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+            main_menu(v_cuentas, v_cajeros, freq_cajeros,euv)
 
     return v_cuentas, v_cajeros, freq_cajeros
 
-actualizado = 0
+elementos_utiles_v = 600
 cargar_cuentas(v_cuentas)
 cargar_cajeros(v_cajeros)
-main_menu(v_cuentas, v_cajeros, freq_cajeros, actualizado)
+main_menu(v_cuentas, v_cajeros, freq_cajeros,elementos_utiles_v)
